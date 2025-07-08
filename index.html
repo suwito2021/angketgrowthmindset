@@ -1,0 +1,674 @@
+
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemetaan Profil Pola Pikir</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .question-row:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .question-row:nth-child(even) {
+            background-color: rgba(240, 244, 248, 0.7);
+        }
+        .timer-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+            }
+        }
+        .input-field:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background-color: white;
+                font-size: 12pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+            .print-full-width {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .print-break-inside-avoid {
+                break-inside: avoid;
+            }
+            .print-mb {
+                margin-bottom: 15px;
+            }
+            .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .print-header h1 {
+                font-size: 18pt;
+                font-weight: bold;
+            }
+            .print-header p {
+                font-size: 10pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 print:bg-white">
+        <div class="container mx-auto px-4 py-8 print:p-0">
+            <header class="text-center mb-8 print:print-header">
+                <h1 class="text-3xl font-bold text-indigo-800 mb-2">Pemetaan Profil Pola Pikir</h1>
+                <p class="text-gray-600 max-w-2xl mx-auto mb-1">Beri tanda pada setiap pernyataan di bawah ini yang sesuai dengan pendapat Anda untuk mengetahui profil pola pikir Anda.</p>
+                <p class="text-indigo-700 font-medium">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyAq3aOOQkDsLNccOl0yZNFKv-GqgDizEkMg&s" alt="Foto Suwito Setiadi" class="inline-block w-8 h-8 rounded-full align-middle mr-2">
+                    Suwito Setiadi - Pengawas Deli Serdang
+                </p>
+            </header>
+
+            
+            <!-- Welcome Screen with User Data Form -->
+            <div id="welcomeScreen" class="bg-white rounded-lg shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-indigo-800 mb-4 text-center">Selamat Datang</h2>
+                <p class="text-gray-600 mb-6 text-center">Anda akan diberikan waktu 20 menit untuk menyelesaikan pemetaan profil pola pikir ini.</p>
+                
+                <form id="userDataForm" class="max-w-md mx-auto">
+                    <div class="mb-6">
+                        <label for="fullName" class="block text-gray-700 font-medium mb-2">Nama Lengkap</label>
+                        <input type="text" id="fullName" name="fullName" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-300" placeholder="Masukkan nama lengkap Anda" required>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <label for="school" class="block text-gray-700 font-medium mb-2">Asal Sekolah</label>
+                        <input type="text" id="school" name="school" class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none transition duration-300" placeholder="Masukkan asal sekolah Anda" required>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button id="startBtn" type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                            Mulai
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Timer Display -->
+            <div id="timerDisplay" class="fixed top-4 right-4 bg-white rounded-full shadow-lg p-3 hidden no-print">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span id="timer" class="text-lg font-bold">20:00</span>
+                </div>
+            </div>
+
+            <div id="questionForm" class="bg-white rounded-lg shadow-lg overflow-hidden mb-8 hidden">
+                <div class="p-6">
+                    <form id="mindsetForm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-indigo-700 text-white">
+                                        <th class="py-3 px-4 text-left w-1/12">No.</th>
+                                        <th class="py-3 px-4 text-left w-5/12">Pernyataan</th>
+                                        <th class="py-3 px-4 text-center w-1.5/12">Sangat Setuju</th>
+                                        <th class="py-3 px-4 text-center w-1.5/12">Setuju</th>
+                                        <th class="py-3 px-4 text-center w-1.5/12">Tidak Setuju</th>
+                                        <th class="py-3 px-4 text-center w-1.5/12">Sangat Tidak Setuju</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">1</td>
+                                        <td class="py-3 px-4">Kemampuan Anda adalah sesuatu yang sangat mendasar yang tidak banyak dapat Anda ubah lagi.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q1" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q1" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q1" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q1" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">2</td>
+                                        <td class="py-3 px-4">Tidak peduli seberapapun tingkat kemampuan Anda saat ini, Anda bisa mengubahnya walaupun sedikit.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q2" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q2" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q2" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q2" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">3</td>
+                                        <td class="py-3 px-4">Anda akan selalu dapat mengubah kemampuan Anda</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q3" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q3" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q3" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q3" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">4</td>
+                                        <td class="py-3 px-4">Anda adalah seseorang yang unik, tidak banyak yang dapat dilakukan untuk mengubahnya.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q4" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q4" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q4" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q4" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">5</td>
+                                        <td class="py-3 px-4">Anda akan selalu dapat mengubah diri Anda sendiri</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q5" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q5" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q5" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q5" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">6</td>
+                                        <td class="py-3 px-4">Kemampuan dalam bidang seni dan musik dapat dipelajari oleh siapapun</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q6" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q6" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q6" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q6" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">7</td>
+                                        <td class="py-3 px-4">Hanya sedikit orang yang benar-benar mahir dalam olahraga, Anda harus membawa bakat ini sejak lahir.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q7" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q7" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q7" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q7" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">8</td>
+                                        <td class="py-3 px-4">Matematika lebih mudah dipelajari oleh pria atau seseorang yang berada dalam lingkungan yang menyukainya</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q8" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q8" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q8" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q8" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">9</td>
+                                        <td class="py-3 px-4">Makin keras Anda mengerjakan sesuatu makin mahir Anda dalam hal ini</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q9" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q9" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q9" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q9" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">10</td>
+                                        <td class="py-3 px-4">Tidak peduli tipe apapun Anda saat ini, Anda akan selalu dapat mengubahnya</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q10" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q10" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q10" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q10" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">11</td>
+                                        <td class="py-3 px-4">Mencoba sesuatu yang baru akan sangat menyulitkan Anda sehingga Anda ingin menghindarinya.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q11" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q11" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q11" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q11" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">12</td>
+                                        <td class="py-3 px-4">Sebagian orang baik dan pintar, sebagian lagi tidak. Tidak banyak yang dapat berubah.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q12" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q12" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q12" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q12" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">13</td>
+                                        <td class="py-3 px-4">Saya sengat menghargai kritik dan saran dari siapapun juga terkait dengan kinerja saya saat ini.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q13" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q13" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q13" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q13" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">14</td>
+                                        <td class="py-3 px-4">Saya kurang senang bila ada kritik dan saran dari orang lain.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q14" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q14" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q14" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q14" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">15</td>
+                                        <td class="py-3 px-4">Semua orang yang tanpa cacat-otak atau cacat-lahir memiliki kemampuan yang sama dalam belajar</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q15" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q15" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q15" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q15" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">16</td>
+                                        <td class="py-3 px-4">Anda bisa mempelajari sesuatu yang baru, tapi Anda tidak bisa mengubah kemampuan Anda</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q16" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q16" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q16" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q16" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">17</td>
+                                        <td class="py-3 px-4">Anda dapat melakukan sesuatu secara berbeda, tapi sebenarnya Anda tetap tidak dapat mengubah kemampuan Anda</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q17" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q17" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q17" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q17" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">18</td>
+                                        <td class="py-3 px-4">Semua orang pada dasarnya baik, tapi kadang-kadang membuat keputusan yang salah</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q18" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q18" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q18" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q18" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">19</td>
+                                        <td class="py-3 px-4">Alasan terpenting mengapa Anda mela-kukan pekerjaan Anda adalah keinginan untuk mempelajari sesuatu yang baru.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q19" value="4" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q19" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q19" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q19" value="1" class="w-4 h-4"></td>
+                                    </tr>
+                                    <tr class="question-row">
+                                        <td class="py-3 px-4">20</td>
+                                        <td class="py-3 px-4">Orang yang benar-benar cerdas, tidak perlu bekerja keras.</td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q20" value="1" class="w-4 h-4" required></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q20" value="2" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q20" value="3" class="w-4 h-4"></td>
+                                        <td class="py-3 px-4 text-center"><input type="radio" name="q20" value="4" class="w-4 h-4"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-8 flex justify-center">
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                                Lihat Hasil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Time's Up Modal -->
+            <div id="timeUpModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden no-print">
+                <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Waktu Habis!</h3>
+                        <p class="text-gray-600 mb-6">Waktu Anda untuk menyelesaikan pemetaan profil pola pikir telah habis. Jawaban Anda akan dikirimkan secara otomatis.</p>
+                        <button id="timeUpSubmitBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out">
+                            Lihat Hasil
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results" class="bg-white rounded-lg shadow-lg p-6 mb-8 hidden print:block print:shadow-none">
+                <div class="print-header hidden print:block">
+                    <h1>Hasil Pemetaan Profil Pola Pikir</h1>
+                    <p>Laporan hasil penilaian pola pikir berdasarkan kuesioner yang telah diisi</p>
+                    <p class="font-medium">Suwito Setiadi - Pengawas Deli Serdang</p>
+                </div>
+                
+                <h2 class="text-2xl font-bold text-indigo-800 mb-4 print:text-black">Hasil Pemetaan Pola Pikir</h2>
+                
+                <!-- User Information Display -->
+                <div class="bg-indigo-50 p-4 rounded-lg mb-6 print:bg-white print:border print:border-gray-300 print:mb-4">
+                    <div class="flex flex-col md:flex-row md:justify-between">
+                        <div class="mb-2 md:mb-0">
+                            <span class="font-medium text-gray-700">Nama:</span>
+                            <span id="resultName" class="ml-2 text-indigo-700 print:text-black"></span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-700">Asal Sekolah:</span>
+                            <span id="resultSchool" class="ml-2 text-indigo-700 print:text-black"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6 print:mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-700 font-medium">Skor Anda:</span>
+                        <span id="totalScore" class="text-indigo-700 font-bold text-xl print:text-black">0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 print:h-3">
+                        <div id="scoreBar" class="bg-indigo-600 h-4 rounded-full print:h-3" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 print:gap-4 print-break-inside-avoid">
+                    <div class="bg-indigo-50 p-5 rounded-lg print:bg-white print:border print:border-gray-300 print:p-4">
+                        <h3 class="text-lg font-semibold text-indigo-800 mb-3 print:text-black print:mb-2">Interpretasi Hasil</h3>
+                        <div id="interpretation" class="text-gray-700 print:text-black"></div>
+                    </div>
+                    <div class="bg-indigo-50 p-5 rounded-lg print:bg-white print:border print:border-gray-300 print:p-4">
+                        <h3 class="text-lg font-semibold text-indigo-800 mb-3 print:text-black print:mb-2">Rekomendasi Pengembangan</h3>
+                        <div id="recommendations" class="text-gray-700 print:text-black"></div>
+                    </div>
+                </div>
+
+                <div class="mt-8 print:mt-4 print-break-inside-avoid">
+                    <h3 class="text-lg font-semibold text-indigo-800 mb-3 print:text-black print:mb-2">Grafik Pola Pikir</h3>
+                    <div class="bg-white p-4 rounded-lg border border-gray-200 print:p-2">
+                        <div class="flex items-center justify-center">
+                            <div class="w-full max-w-md">
+                                <div class="relative pt-1">
+                                    <div class="flex mb-2 items-center justify-between">
+                                        <div>
+                                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200 print:bg-gray-200">
+                                                Fixed Mindset
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200 print:bg-gray-200">
+                                                Growth Mindset
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex h-4 mb-4 overflow-hidden text-xs bg-gray-200 rounded-full print:h-3">
+                                        <div id="fixedMindsetBar" class="flex flex-col justify-center text-center text-white bg-red-500 transition-all duration-500" style="width: 50%">
+                                            <span id="fixedMindsetPercentage" class="font-semibold">50%</span>
+                                        </div>
+                                        <div id="growthMindsetBar" class="flex flex-col justify-center text-center text-white bg-green-500 transition-all duration-500" style="width: 50%">
+                                            <span id="growthMindsetPercentage" class="font-semibold">50%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-center space-x-4 no-print">
+                    <button id="printBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Cetak Hasil
+                    </button>
+                    <button id="resetBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-8 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
+                        Isi Kembali
+                    </button>
+                </div>
+                
+                <!-- Print date and time footer -->
+                <div class="hidden print:block mt-8 text-center text-sm text-gray-500">
+                    <p>Dicetak pada: <span id="printDate"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userDataForm = document.getElementById('userDataForm');
+            const welcomeScreen = document.getElementById('welcomeScreen');
+            const questionForm = document.getElementById('questionForm');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerElement = document.getElementById('timer');
+            const timeUpModal = document.getElementById('timeUpModal');
+            const timeUpSubmitBtn = document.getElementById('timeUpSubmitBtn');
+            const form = document.getElementById('mindsetForm');
+            const results = document.getElementById('results');
+            const totalScoreElement = document.getElementById('totalScore');
+            const scoreBar = document.getElementById('scoreBar');
+            const interpretation = document.getElementById('interpretation');
+            const recommendations = document.getElementById('recommendations');
+            const fixedMindsetBar = document.getElementById('fixedMindsetBar');
+            const growthMindsetBar = document.getElementById('growthMindsetBar');
+            const fixedMindsetPercentage = document.getElementById('fixedMindsetPercentage');
+            const growthMindsetPercentage = document.getElementById('growthMindsetPercentage');
+            const resetBtn = document.getElementById('resetBtn');
+            const printBtn = document.getElementById('printBtn');
+            const resultName = document.getElementById('resultName');
+            const resultSchool = document.getElementById('resultSchool');
+            const printDate = document.getElementById('printDate');
+
+            let timer;
+            let timeLeft = 20 * 60; // 20 minutes in seconds
+            let userData = {
+                fullName: '',
+                school: ''
+            };
+
+            // Format time as MM:SS
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+
+            // Format date for printing
+            function formatDate(date) {
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                return date.toLocaleDateString('id-ID', options);
+            }
+
+            // Start the timer
+            function startTimer() {
+                timerElement.textContent = formatTime(timeLeft);
+                timerDisplay.classList.remove('hidden');
+                
+                timer = setInterval(function() {
+                    timeLeft--;
+                    timerElement.textContent = formatTime(timeLeft);
+                    
+                    // Add pulsing effect when time is running low (less than 1 minute)
+                    if (timeLeft <= 60) {
+                        timerDisplay.classList.add('bg-red-100', 'timer-pulse');
+                        timerElement.classList.add('text-red-600');
+                    }
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        timeUpModal.classList.remove('hidden');
+                    }
+                }, 1000);
+            }
+
+            // User data form submit handler
+            userDataForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get user data
+                userData.fullName = document.getElementById('fullName').value.trim();
+                userData.school = document.getElementById('school').value.trim();
+                
+                // Validate form
+                if (!userData.fullName || !userData.school) {
+                    alert('Silakan isi semua data yang diperlukan.');
+                    return;
+                }
+                
+                // Hide welcome screen and show question form
+                welcomeScreen.classList.add('hidden');
+                questionForm.classList.remove('hidden');
+                
+                // Start the timer
+                startTimer();
+            });
+
+            // Time's up submit button handler
+            timeUpSubmitBtn.addEventListener('click', function() {
+                timeUpModal.classList.add('hidden');
+                submitForm();
+            });
+
+            // Calculate and display results
+            function submitForm() {
+                // Calculate total score
+                let totalScore = 0;
+                let answeredQuestions = 0;
+                
+                for (let i = 1; i <= 20; i++) {
+                    const questionName = `q${i}`;
+                    const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                    
+                    if (selectedOption) {
+                        totalScore += parseInt(selectedOption.value);
+                        answeredQuestions++;
+                    }
+                }
+                
+                // If not all questions are answered, estimate the score
+                if (answeredQuestions < 20) {
+                    // Calculate average score per answered question
+                    const avgScore = totalScore / answeredQuestions;
+                    // Estimate total score as if all questions were answered with the same average
+                    totalScore = Math.round(avgScore * 20);
+                }
+                
+                // Maximum possible score is 80 (20 questions × 4 points max)
+                const maxScore = 80;
+                const scorePercentage = (totalScore / maxScore) * 100;
+                
+                // Update the score display
+                totalScoreElement.textContent = totalScore;
+                scoreBar.style.width = `${scorePercentage}%`;
+                
+                // Calculate mindset percentages
+                const growthMindsetPercent = Math.round(scorePercentage);
+                const fixedMindsetPercent = 100 - growthMindsetPercent;
+                
+                // Update mindset bars
+                growthMindsetBar.style.width = `${growthMindsetPercent}%`;
+                fixedMindsetBar.style.width = `${fixedMindsetPercent}%`;
+                growthMindsetPercentage.textContent = `${growthMindsetPercent}%`;
+                fixedMindsetPercentage.textContent = `${fixedMindsetPercent}%`;
+                
+                // Display user information
+                resultName.textContent = userData.fullName;
+                resultSchool.textContent = userData.school;
+                
+                // Set print date
+                printDate.textContent = formatDate(new Date());
+                
+                // Provide interpretation based on score
+                if (totalScore >= 65) {
+                    interpretation.innerHTML = `
+                        <p>Anda memiliki <strong>Growth Mindset</strong> yang kuat. Anda percaya bahwa kemampuan dan kecerdasan dapat dikembangkan melalui dedikasi dan kerja keras.</p>
+                        <p class="mt-2">Anda melihat tantangan sebagai kesempatan untuk berkembang dan belajar, bukan sebagai ancaman.</p>
+                    `;
+                    recommendations.innerHTML = `
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Teruslah mengembangkan pola pikir positif ini dengan mencari tantangan baru</li>
+                            <li>Bagikan perspektif Anda dengan orang lain untuk membantu mereka mengembangkan growth mindset</li>
+                            <li>Gunakan kekuatan ini untuk mengatasi rintangan yang lebih besar dalam hidup dan karir Anda</li>
+                        </ul>
+                    `;
+                } else if (totalScore >= 50) {
+                    interpretation.innerHTML = `
+                        <p>Anda memiliki <strong>Growth Mindset</strong> yang sedang berkembang. Anda cenderung percaya bahwa kemampuan dapat ditingkatkan, tetapi mungkin masih memiliki beberapa keyakinan fixed mindset dalam area tertentu.</p>
+                    `;
+                    recommendations.innerHTML = `
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Identifikasi area di mana Anda masih memiliki fixed mindset dan tantang keyakinan tersebut</li>
+                            <li>Praktikkan melihat kegagalan sebagai kesempatan belajar, bukan refleksi kemampuan tetap Anda</li>
+                            <li>Cari lingkungan yang mendukung pertumbuhan dan pembelajaran berkelanjutan</li>
+                        </ul>
+                    `;
+                } else if (totalScore >= 35) {
+                    interpretation.innerHTML = `
+                        <p>Anda memiliki campuran <strong>Fixed Mindset</strong> dan <strong>Growth Mindset</strong>. Dalam beberapa situasi, Anda percaya kemampuan dapat berkembang, sementara di situasi lain Anda mungkin merasa kemampuan bersifat tetap.</p>
+                    `;
+                    recommendations.innerHTML = `
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Perhatikan kapan Anda cenderung mengadopsi fixed mindset dan tanyakan mengapa</li>
+                            <li>Mulailah dengan mengubah dialog internal Anda dari "Saya tidak bisa" menjadi "Saya belum bisa"</li>
+                            <li>Tetapkan tujuan pembelajaran, bukan hanya tujuan kinerja</li>
+                        </ul>
+                    `;
+                } else {
+                    interpretation.innerHTML = `
+                        <p>Anda cenderung memiliki <strong>Fixed Mindset</strong> yang dominan. Anda mungkin percaya bahwa kemampuan dan kecerdasan adalah sifat tetap yang tidak banyak dapat diubah.</p>
+                    `;
+                    recommendations.innerHTML = `
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>Mulailah dengan menantang keyakinan bahwa kemampuan tidak dapat berubah</li>
+                            <li>Coba lihat kegagalan sebagai bagian dari proses pembelajaran, bukan sebagai bukti keterbatasan</li>
+                            <li>Tetapkan tujuan kecil untuk mengembangkan keterampilan baru dan rayakan kemajuan Anda</li>
+                            <li>Cari contoh orang yang telah mengembangkan kemampuan mereka melalui latihan dan ketekunan</li>
+                        </ul>
+                    `;
+                }
+                
+                // Stop the timer if it's still running
+                if (timer) {
+                    clearInterval(timer);
+                }
+                
+                // Hide the timer display
+                timerDisplay.classList.add('hidden');
+                
+                // Show results
+                questionForm.classList.add('hidden');
+                results.classList.remove('hidden');
+            }
+            
+            // Form submit handler
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitForm();
+            });
+            
+            // Print button handler
+            printBtn.addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Reset button functionality
+            resetBtn.addEventListener('click', function() {
+                form.reset();
+                results.classList.add('hidden');
+                welcomeScreen.classList.remove('hidden');
+                
+                // Reset timer
+                clearInterval(timer);
+                timeLeft = 20 * 60;
+                timerElement.textContent = formatTime(timeLeft);
+                timerDisplay.classList.remove('bg-red-100', 'timer-pulse');
+                timerElement.classList.remove('text-red-600');
+                
+                // Clear user data form
+                document.getElementById('fullName').value = '';
+                document.getElementById('school').value = '';
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95c0727d96e9a033',t:'MTc1MTk4Njc4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
